@@ -1,0 +1,24 @@
+# Kept private for now
+docs/parts-list.md
+
+# Build output, made again by idf.py build
+firmware/build/
+firmware/managed_components/
+firmware/sdkconfig.old
+firmware/.cache/
+
+# Parts, will release when finalized.
+docs/parts-list.md
+docs/printed-parts/
+blender/
+
+
+
+# Editor settings
+.vscode/
+
+# Mac and Blender junk
+.DS_Store
+*.blend1
+
+
