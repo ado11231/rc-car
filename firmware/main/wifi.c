@@ -16,7 +16,6 @@
 static const char *TAG = "wifi";
 
 // WIFI calls this when an event happens; such as a phone joining
-
 static void on_wifi_event(void *arg, esp_event_base_t base, int32_t id, void *data) {
     if (id == WIFI_EVENT_AP_STACONNECTED) {
         ESP_LOGI(TAG, "Phone Joined");
@@ -47,7 +46,6 @@ void wifi_start(void) {
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, on_wifi_event, NULL));
 
     // Describes the network.
-
     wifi_config_t config = {
         .ap = {
             .ssid = CAR_SSID,
@@ -64,5 +62,4 @@ void wifi_start(void) {
     ESP_ERROR_CHECK(esp_wifi_start());
 
     ESP_LOGI(TAG, "network \"%s\" is up", CAR_SSID);
-
 }
