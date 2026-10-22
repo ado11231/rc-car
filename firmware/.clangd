@@ -1,0 +1,11 @@
+# Editor help (clangd) for the ESP-IDF build.
+# ESP-IDF builds with Espressif's GCC. Drop the GCC-only flags clangd can't read.
+CompileFlags:
+  CompilationDatabase: build
+  Remove:
+    - -mtune=*
+    - -fno-shrink-wrap
+    - -fstrict-volatile-bitfields
+    - -fno-tree-switch-conversion
+    - -fzero-init-padding-bits=*
+    - -fno-malloc-dce
