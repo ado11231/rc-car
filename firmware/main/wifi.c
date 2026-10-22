@@ -34,7 +34,7 @@ void wifi_start(void) {
     }
     ESP_ERROR_CHECK(err);
 
-    // Netwrok plumbing: IP layer, event system & access point.
+    // Network plumbing: IP layer, event system & access point.
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     esp_netif_create_default_wifi_ap();
@@ -43,7 +43,7 @@ void wifi_start(void) {
     wifi_init_config_t init = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&init));
 
-    // Call on_wifi_event for every WIFI hate
+    // Call on_wifi_event for every WIFI call.
     ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, on_wifi_event, NULL));
 
     // Describes the network.

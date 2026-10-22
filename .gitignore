@@ -9,7 +9,6 @@ firmware/.cache/
 
 # Parts, will release when finalized.
 docs/parts-list.md
-docs/printed-parts/
 blender/
 
 
