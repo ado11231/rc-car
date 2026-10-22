@@ -26,5 +26,5 @@ void web_start(void) {
     }
 
     httpd_register_uri_handler(server, &root);
-    ESP_LOGI(TAG, "server running at https://192.168.4.1");
+    ESP_LOGI(TAG, "server running at http://192.168.4.1");
 }
