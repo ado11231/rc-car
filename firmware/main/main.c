@@ -2,6 +2,7 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "wifi.h"
 
 // Onboard blue LED, on when the pin is low
 #define LED_PIN GPIO_NUM_8
@@ -11,11 +12,12 @@ static const char *TAG = "car";
 void app_main(void)
 {
     ESP_LOGI(TAG, "hello from the car");
+    wifi_start();
 
     gpio_reset_pin(LED_PIN);
     gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 
-    // Blink once a second
+    // Blinks once a second
     int on = 0;
     while (1) {
         on = !on;
