@@ -4,9 +4,12 @@
 
 static const char *TAG = "web";
 
+// index.html, baked into flash by CMake (EMBED_TXTFILES)
+extern const char index_html[] asm("_binary_index_html_start");
+
 static esp_err_t root_get_handler(httpd_req_t *req) {
     httpd_resp_set_type(req, "text/html");
-    httpd_resp_send(req, "<h1>Hello from the car</h1>", HTTPD_RESP_USE_STRLEN);
+    httpd_resp_send(req, index_html, HTTPD_RESP_USE_STRLEN);
     return ESP_OK;
 }
 
