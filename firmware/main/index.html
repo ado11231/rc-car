@@ -2,138 +2,71 @@
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 <title>rc-car</title>
 <style>
-  * { box-sizing: border-box; margin: 0; }
-  html, body { height: 100%; }
   body {
+    margin: 0;
+    height: 100vh;
     background: #111;
-    color: #eee;
+    color: #888;
     font-family: system-ui, sans-serif;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
     overflow: hidden;
-    touch-action: none;          /* no scrolling or zooming while driving */
+    touch-action: none;
     user-select: none;
     -webkit-user-select: none;
   }
-  header {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 24px;
-    font-size: 14px;
-    color: #888;
-  }
+  #status { position: fixed; top: 12px; left: 24px; font-size: 14px; }
   #status::before {
     content: "";
     display: inline-block;
     width: 8px; height: 8px;
-    border-radius: 50%;
-    background: #c33;            /* red = not connected */
     margin-right: 8px;
+    border-radius: 50%;
+    background: #c33;
   }
-  #status.on::before { background: #3c6; }   /* green = connected */
-  #readout { font-family: ui-monospace, monospace; color: #666; }
-
-  /* left stick on the left, right stick on the right */
-  main {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 24px 16px;
-  }
-  .stick { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .label { font-size: 12px; letter-spacing: .1em; color: #666; }
-
-  /* the round base the knob moves around in */
+  #status.on::before { background: #3c6; }
   .pad {
-    --size: min(220px, 62vh);
     position: relative;
-    width: var(--size); height: var(--size);
+    width: min(220px, 62vh); aspect-ratio: 1;
     border-radius: 50%;
     border: 2px solid #333;
     background: #1a1a1a;
   }
-  /* faint line showing which way the knob can move */
-  .pad::before {
-    content: "";
-    position: absolute;
-    background: #2a2a2a;
-    border-radius: 2px;
-  }
-  .pad.vertical::before   { left: 50%; top: 14px; bottom: 14px; width: 4px; margin-left: -2px; }
-  .pad.horizontal::before { top: 50%; left: 14px; right: 14px; height: 4px; margin-top: -2px; }
-
+  .pad::before { content: ""; position: absolute; background: #2a2a2a; }
+  .pad.v::before { inset: 14px calc(50% - 2px); }
+  .pad.h::before { inset: calc(50% - 2px) 14px; }
   .knob {
-    --knob: calc(var(--size) * .4);
     position: absolute;
-    left: 50%; top: 50%;
-    width: var(--knob); height: var(--knob);
-    margin: calc(var(--knob) / -2) 0 0 calc(var(--knob) / -2);   /* centre the knob on the pad */
+    inset: 30%;
     border-radius: 50%;
     background: #f80;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, .6);
   }
-  .knob.back { transition: transform .15s; }   /* smooth snap back to centre */
-
-  /* Phone held upright: cover everything and ask to turn it sideways */
+  .knob.back { transition: transform .15s; }
   #rotate {
     display: none;
     position: fixed;
     inset: 0;
     background: #111;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    font-size: 16px;
-    color: #888;
   }
-  #rotate .phone {
-    width: 44px; height: 76px;
-    border: 3px solid #f80;
-    border-radius: 8px;
-    animation: turn 1.6s ease-in-out infinite;
-  }
-  @keyframes turn {
-    0%, 30%   { transform: rotate(0deg); }
-    60%, 100% { transform: rotate(-90deg); }
-  }
-  @media (orientation: portrait) {
-    #rotate { display: flex; }
-  }
+  @media (orientation: portrait) { #rotate { display: flex; } }
 </style>
 </head>
 <body>
-  <header>
-    <div id="status">disconnected</div>
-    <div id="readout">x 0  y 0</div>
-  </header>
-  <main>
-    <div class="stick">
-      <div class="pad vertical" id="throttle"><div class="knob"></div></div>
-      <div class="label">SPEED</div>
-    </div>
-    <div class="stick">
-      <div class="pad horizontal" id="steering"><div class="knob"></div></div>
-      <div class="label">STEER</div>
-    </div>
-  </main>
-  <div id="rotate">
-    <div class="phone"></div>
-    <div>Turn your phone sideways</div>
-  </div>
+  <div id="status">disconnected</div>
+  <div class="pad v" id="speed"><div class="knob"></div></div>
+  <div class="pad h" id="steer"><div class="knob"></div></div>
+  <div id="rotate">Turn your phone sideways</div>
 
 <script>
 const status = document.getElementById('status');
-const readout = document.getElementById('readout');
+let x = 0, y = 0, ws;
 
-let x = 0, y = 0;    // x = steering, y = speed, both -100 to 100
-let ws;
-
-// Open the WebSocket. If it drops, try again every second.
 function connect() {
   ws = new WebSocket('ws://' + (location.host || '192.168.4.1') + '/ws');
   ws.onopen = () => { status.textContent = 'connected'; status.className = 'on'; };
@@ -145,26 +78,20 @@ function connect() {
 }
 connect();
 
-// Turns a round pad into a one-axis stick. onChange gets a value from -100 to 100.
-// Each stick follows its own finger, so you can drive with both thumbs at once.
 function makeStick(pad, vertical, onChange) {
-  const knob = pad.querySelector('.knob');
+  const knob = pad.firstChild;
   let active = false;
 
   function move(e) {
     const r = pad.getBoundingClientRect();
     const travel = (r.width - knob.offsetWidth) / 2;
-    let d = vertical ? e.clientY - (r.top + r.height / 2)
-                     : e.clientX - (r.left + r.width / 2);
-    d = Math.max(-travel, Math.min(travel, d));      // keep knob inside the circle
-
+    let d = vertical ? e.clientY - r.top - r.height / 2 : e.clientX - r.left - r.width / 2;
+    d = Math.max(-travel, Math.min(travel, d));
     knob.classList.remove('back');
     knob.style.transform = vertical ? `translateY(${d}px)` : `translateX(${d}px)`;
-    // screen y grows downward, so flip it: up = forward
     onChange(Math.round((vertical ? -d : d) / travel * 100));
   }
 
-  // Finger lifted: knob springs back and the value goes to 0
   function release() {
     active = false;
     knob.classList.add('back');
@@ -172,25 +99,21 @@ function makeStick(pad, vertical, onChange) {
     onChange(0);
   }
 
-  pad.addEventListener('pointerdown', e => { active = true; pad.setPointerCapture(e.pointerId); move(e); });
-  pad.addEventListener('pointermove', e => { if (active) move(e); });
-  pad.addEventListener('pointerup', release);
-  pad.addEventListener('pointercancel', release);
+  pad.onpointerdown = e => { active = true; pad.setPointerCapture(e.pointerId); move(e); };
+  pad.onpointermove = e => { if (active) move(e); };
+  pad.onpointerup = pad.onpointercancel = release;
   return release;
 }
 
-const releaseThrottle = makeStick(document.getElementById('throttle'), true,  v => y = v);
-const releaseSteering = makeStick(document.getElementById('steering'), false, v => x = v);
+const releaseSpeed = makeStick(document.getElementById('speed'), true, v => y = v);
+const releaseSteer = makeStick(document.getElementById('steer'), false, v => x = v);
 
-// Phone turned upright mid-drive: let go of both sticks so the car stops
-matchMedia('(orientation: portrait)').addEventListener('change', e => {
-  if (e.matches) { releaseThrottle(); releaseSteering(); }
-});
+matchMedia('(orientation: portrait)').onchange = e => {
+  if (e.matches) { releaseSpeed(); releaseSteer(); }
+};
 
-// 20 times a second, send "x,y" to the car
 setInterval(() => {
-  readout.textContent = `x ${x}  y ${y}`;
-  if (ws && ws.readyState === WebSocket.OPEN) ws.send(x + ',' + y);
+  if (ws.readyState === WebSocket.OPEN) ws.send(x + ',' + y);
 }, 50);
 </script>
 </body>
