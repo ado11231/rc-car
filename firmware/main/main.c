@@ -4,6 +4,7 @@
 #include "esp_log.h"
 #include "wifi.h"
 #include "web.h"
+#include "drive.h"
 
 // Onboard blue LED, on when the pin is low
 #define LED_PIN GPIO_NUM_8
@@ -14,6 +15,7 @@ void app_main(void)
 {
     ESP_LOGI(TAG, "hello from the car");
     wifi_start();
+    drive_start();
     web_start();
 
     gpio_reset_pin(LED_PIN);

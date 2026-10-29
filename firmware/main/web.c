@@ -2,6 +2,7 @@
 #include "esp_log.h"
 #include "web.h"
 #include <stdio.h>
+#include "drive.h"
 
 static const char *TAG = "web";
 
@@ -39,6 +40,7 @@ static esp_err_t ws_handler(httpd_req_t *req) {
     int x, y;
     if (sscanf(buf, "%d,%d", &x, &y) == 2) {
         ESP_LOGI(TAG, "x %d  y %d", x, y);
+        drive_steer(x);
     }
     return ESP_OK;
 }
