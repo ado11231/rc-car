@@ -41,6 +41,7 @@ static esp_err_t ws_handler(httpd_req_t *req) {
     if (sscanf(buf, "%d,%d", &x, &y) == 2) {
         ESP_LOGI(TAG, "x %d  y %d", x, y);
         drive_steer(x);
+        drive_speed(y);
     }
     return ESP_OK;
 }
