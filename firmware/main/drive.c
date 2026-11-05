@@ -79,7 +79,7 @@ static void watchdog(void *arg) {
         stopped = true;
         set_pulse_us(STEER_CENTER_US);
         set_motors(0);
-        ESP_LOGW(TAG, "no signal, steering centered");
+        ESP_LOGW(TAG, "no signal, stopped");
     }
 }
 
