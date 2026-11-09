@@ -21,3 +21,6 @@ blender/
 *.blend1
 
 
+
+# Soldering notes, kept local
+docs/soldering-parts.md
