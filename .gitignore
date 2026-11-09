@@ -7,20 +7,12 @@ firmware/managed_components/
 firmware/sdkconfig.old
 firmware/.cache/
 
-# Parts, will release when finalized.
-docs/parts-list.md
-blender/
-
-
-
-# Editor settings
-.vscode/
+# Blender scripts, kept local for now
+blender/scripts/
 
 # Mac and Blender junk
 .DS_Store
 *.blend1
-
-
 
 # Soldering notes, kept local
 docs/soldering-parts.md

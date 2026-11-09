@@ -1,7 +1,7 @@
 # Architecture
 
 * How the car is built and wired, and how the code will run it.
-* What to buy: [parts-list.md](parts-list.md). Drawings: [printed-parts](printed-parts/README.md).
+* What to buy: [parts-list.md](parts-list.md). Drawings: [drawings](drawings/).
 
 ## Contents
 
@@ -21,7 +21,6 @@
 * A small RC car you drive from your phone. 202 mm long, about 5 mph.
 * The brain (ESP32-C3) makes its own Wi-Fi. Join it, open the page, drive with the joystick. No app.
 * Rear motors drive, a servo steers the front wheels.
-* Underglow in any color, red when braking.
 * Battery level shows on the phone.
 * Every part unplugs from the main board, so any part can be swapped without soldering.
 * 7 printed parts. Everything else is bought.
@@ -44,7 +43,6 @@ flowchart LR
         CAP["470uF<br/>capacitor"]
         C3["ESP32-C3<br/>5V pin"]
         SP["Servo plug<br/>5V"]
-        LP["Light plug<br/>5V"]
         G3["ESP32-C3<br/>G3"]
     end
 
@@ -54,7 +52,6 @@ flowchart LR
     PT -->|7.4V| DIV
     MINI -->|5V| C3
     MINI -->|5V| SP
-    MINI -->|5V| LP
     MINI -->|5V| CAP
     DIV -->|"1.47V when full"| G3
 
@@ -62,12 +59,12 @@ flowchart LR
     classDef v5 fill:#fff0d9,stroke:#d68910,color:#111
     classDef sig fill:#e2edfb,stroke:#2e6fd8,color:#111
     class BAT,JST,SW,PT,DRV,DIV v7
-    class MINI,CAP,C3,SP,LP v5
+    class MINI,CAP,C3,SP v5
     class G3 sig
     style BOARD fill:none,stroke:#888
     linkStyle 0,1,2,3,4,5 stroke:#c0392b,stroke-width:2px
-    linkStyle 6,7,8,9 stroke:#d68910,stroke-width:2px
-    linkStyle 10 stroke:#2e6fd8,stroke-width:2px
+    linkStyle 6,7,8 stroke:#d68910,stroke-width:2px
+    linkStyle 9 stroke:#2e6fd8,stroke-width:2px
 ```
 
 * Red = battery voltage. Orange = 5V. Blue = signal.
@@ -86,7 +83,6 @@ flowchart LR
         G20["G20"]
         G21["G21"]
         G0["G0"]
-        G1["G1"]
         G3["G3"]
     end
 
@@ -103,9 +99,6 @@ flowchart LR
     ML(["Left motor"])
     MR(["Right motor"])
     SV(["Servo"])
-    R330["330 ohm"]
-    UL(["Left underglow<br/>2 LEDs"])
-    UR(["Right underglow<br/>2 LEDs"])
     DIV["47k / 10k divider<br/>(from the battery)"]
 
     G7 --> IN1
@@ -119,13 +112,12 @@ flowchart LR
     OA -->|screw terminal| ML
     OB -->|screw terminal| MR
     G0 -->|servo plug| SV
-    G1 --> R330 -->|light plug| UL --> UR
     DIV --> G3
 
     classDef pin fill:#e2edfb,stroke:#2e6fd8,color:#111
     classDef part fill:#eeeeee,stroke:#333,color:#111
-    class G7,G10,G20,G21,G0,G1,G3,IN1,IN2,IN3,IN4,OA,OB pin
-    class ML,MR,SV,UL,UR,R330,DIV part
+    class G7,G10,G20,G21,G0,G3,IN1,IN2,IN3,IN4,OA,OB pin
+    class ML,MR,SV,DIV part
     style C3 fill:none,stroke:#888
     style DRV fill:none,stroke:#888
 ```
@@ -133,7 +125,6 @@ flowchart LR
 | Brain pin | Goes to | Job |
 | --- | --- | --- |
 | G0 | Servo plug | Steering |
-| G1 | 330 ohm, then light plug | Underglow colors |
 | G3 | Middle of the 47k / 10k divider | Battery level |
 | G7, G10 | Motor driver IN1, IN2 | Left motor |
 | G20, G21 | Motor driver IN3, IN4 | Right motor |
@@ -150,7 +141,7 @@ flowchart LR
       +------------------------------------------------------+
    23 |      [servo ]                                        |
    22 |                              +---------------------+ |
-   21 |      [lights] [ 330  ]       |                     | |
+   21 |                              |                     | |
    20 |                              |        brain        | |
    19 |                              |      ESP32-C3       | |
    18 |                     [C]      |    on 2 sockets     | |
@@ -185,11 +176,10 @@ flowchart LR
 | Capacitor (C) | + (17,10), - (18,10) |
 | Brain sockets | rows 16 and 22, holes 0 to 7 |
 | Battery resistors (under the brain) | 47k (19,3) to (19,5), 10k (20,5) to (20,3) |
-| Light plug and 330 | plug row 21, holes 13 to 15. 330 from (21,10) to (21,12) |
 | Servo plug | row 23, holes 13 to 15, pins point forward |
 
 * Wires underneath never cross.
-* Two wires run on top: 5V to the servo and light plugs, and battery + to the battery resistors.
+* Two wires run on top: 5V to the servo plug, and battery + to the battery resistors.
 * Every wire is in the 3D model: `blender/rc_car.blend`, collection "Wires".
 
 ## How The Parts Bolt Together
@@ -255,7 +245,6 @@ flowchart TB
 | `web.c` | Serves the joystick page and reads the joystick. |
 | `drive.c` | Motor speed and steering angle (PWM). |
 | `battery.c` | Reads G3 and turns it into a percent. |
-| `lights.c` | Underglow colors. Red when braking. |
 
 ```mermaid
 flowchart LR
@@ -267,13 +256,11 @@ flowchart LR
         WEB["web.c<br/>page + joystick"]
         MAIN["main.c<br/>the boss"]
         DRIVE["drive.c"]
-        LIGHTS["lights.c"]
         BATT["battery.c"]
     end
 
     MOT(["Motors"])
     SV(["Servo"])
-    LED(["Underglow"])
     DIV(["Battery<br/>divider"])
 
     PHONE -->|"1. joystick x, y"| WIFI
@@ -281,18 +268,16 @@ flowchart LR
     WEB -->|"2. x, y"| MAIN
     MAIN -->|"3. speed"| DRIVE
     MAIN -->|"3. angle"| DRIVE
-    MAIN -->|"3. color"| LIGHTS
     DRIVE --> MOT
     DRIVE --> SV
-    LIGHTS --> LED
     DIV -->|"4. voltage"| BATT
     BATT -->|"5. percent"| WEB
     WEB -->|"6. battery %"| PHONE
 
     classDef file fill:#e2edfb,stroke:#2e6fd8,color:#111
     classDef part fill:#eeeeee,stroke:#333,color:#111
-    class WIFI,WEB,MAIN,DRIVE,LIGHTS,BATT file
-    class PHONE,MOT,SV,LED,DIV part
+    class WIFI,WEB,MAIN,DRIVE,BATT file
+    class PHONE,MOT,SV,DIV part
     style C3 fill:none,stroke:#888
 ```
 
@@ -303,11 +288,11 @@ flowchart LR
 ## Build Order
 
 1. **Code setup.** Install ESP-IDF, set the target to esp32c3, run hello world.
-2. **Breadboard test.** Add one part at a time with its code: Wi-Fi page, servo, motors, 5V board, battery reading, underglow, auto stop.
+2. **Breadboard test.** Add one part at a time with its code: Wi-Fi page, servo, motors, 5V board, battery reading, auto stop.
 3. **Print and test fit.** Plate first, then the beam. Melt in the inserts.
 4. **Solder the main board.** Check 5V with the multimeter before the brain goes in.
 5. **Put it together.** Motors, servo, beam, wheels, tray, servo box, bumper, hook.
-6. **Wire it up.** Motors, battery, switch, servo, lights.
+6. **Wire it up.** Motors, battery, switch, servo.
 7. **Drive it.**
 
 ## Safety
@@ -322,10 +307,8 @@ flowchart LR
 | Problem | Plan |
 | --- | --- |
 | G21 is also a debug pin, so the right motor may twitch at power on. | Turn on with the wheels off the ground. Move the pin if it bothers us. |
-| The brain's signal is 3.3V and the LEDs want 5V. | Usually works. If they flicker, add a level shifter. |
 | Screw terminal pins may not fit the perf board holes. | Drill those holes with a 1.2 mm bit. |
 | The plate posts assume the board's corner holes are 2.8 mm from each edge. | Measure the real board before printing the plate. |
-| The light wires hang under the plate. | Tape or zip tie them flat. |
 
 ## File Reference
 
@@ -335,9 +318,9 @@ rc-car/
 ├── blender/
 │   ├── rc_car.blend       the 3D model
 │   └── scripts/
-│       ├── build_car.py   builds the 3D model and checks it
-│       ├── make_sheets.py makes the drawing PDFs
-│       └── render_part.py makes the part pictures
+│       ├── build_model.py   builds the 3D model and checks it
+│       ├── make_drawings.py makes the drawing PDFs
+│       └── render_part.py   makes the part pictures
 ├── firmware/              the car's code (ESP-IDF project)
 │   ├── CMakeLists.txt     names the project
 │   ├── sdkconfig          chip settings (change with idf.py menuconfig)
@@ -347,18 +330,20 @@ rc-car/
 └── docs/
     ├── architecture.md    this file
     ├── parts-list.md      what to buy (kept out of git for now)
-    └── printed-parts/     one folder per part: drawing PDF and pictures
+    ├── drawings/          one drawing PDF per printed part, plus all-parts.pdf
+    ├── renders/           part pictures (NN-name.png, NN-name-on-car.png)
+    └── sketches/          line drawings of the whole car
 ```
 
 ```sh
 # build the model and check it (must show 0 everywhere)
-Blender --background --factory-startup --python blender/scripts/build_car.py -- --check
+Blender --background --factory-startup --python blender/scripts/build_model.py -- --check
 
 # make all drawings
-uv run --with matplotlib python blender/scripts/make_sheets.py
+uv run --with matplotlib python blender/scripts/make_drawings.py
 
 # make one picture
-Blender --background blender/rc_car.blend --python blender/scripts/render_part.py -- --part "Chassis plate" --out part.png
+Blender --background blender/rc_car.blend --python blender/scripts/render_part.py -- --part "Chassis plate"
 ```
 
 * `Blender` is `/Applications/Blender.app/Contents/MacOS/Blender` on a Mac.

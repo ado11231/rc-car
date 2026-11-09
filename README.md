@@ -52,4 +52,4 @@ idf.py build flash monitor
 #### Documentation
 
 * [Architecture](docs/architecture.md): wiring, pin assignments and how the parts fit together.
-* [Printed Parts](docs/printed-parts/README.md): what each printed part does.
+* [Drawings](docs/drawings/): one drawing PDF per printed part, plus all-parts.pdf.
