@@ -236,14 +236,14 @@ flowchart TB
 ## The Code
 
 * Plain C on ESP-IDF, target esp32c3. The project is in `firmware/`. All code goes in `firmware/main/`.
-* So far only `main.c` exists, and it just blinks the onboard LED.
+* All five files are written: Wi-Fi, joystick page, servo, motors, auto-stop and battery reading.
 
 | File | Job |
 | --- | --- |
-| `main.c` | Starts everything. Stops the car if the phone goes quiet. |
+| `main.c` | Starts everything and blinks the onboard LED. |
 | `wifi.c` | Makes the car's Wi-Fi. |
-| `web.c` | Serves the joystick page and reads the joystick. |
-| `drive.c` | Motor speed and steering angle (PWM). |
+| `web.c` | Serves the joystick page, reads the joystick, sends the battery level. |
+| `drive.c` | Motor speed and steering angle (PWM). Stops the car if the phone goes quiet. |
 | `battery.c` | Reads G3 and turns it into a percent. |
 
 ```mermaid
@@ -283,7 +283,8 @@ flowchart LR
 
 * Blue = code files. Grey = things outside the code.
 * Steps 1 to 6 repeat about 20 times a second.
-* If `main.c` hears nothing from the phone for half a second, it stops the motors.
+* If `drive.c` hears nothing from the phone for half a second, it stops the motors and centers the steering.
+* The page asks `/battery` every 2 seconds and shows the percent and voltage.
 
 ## Build Order
 
@@ -326,7 +327,12 @@ rc-car/
 │   ├── sdkconfig          chip settings (change with idf.py menuconfig)
 │   └── main/
 │       ├── CMakeLists.txt lists the .c files to build
-│       └── main.c         starts everything
+│       ├── main.c         starts everything
+│       ├── wifi.c         the car's Wi-Fi
+│       ├── web.c          page, joystick, battery level
+│       ├── drive.c        servo, motors, auto-stop
+│       ├── battery.c      reads the battery on G3
+│       └── assets/index.html  the joystick page
 └── docs/
     ├── architecture.md    this file
     ├── parts-list.md      what to buy (kept out of git for now)

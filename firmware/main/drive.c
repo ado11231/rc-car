@@ -8,53 +8,52 @@
 static const char *TAG = "drive";
 
 #define SERVO_PIN GPIO_NUM_0
-#define SERVO_HZ 50              // one pulse every 20 ms
+#define SERVO_HZ 50              // One pulse every 20 ms
 #define SERVO_PERIOD_US 20000
-#define SERVO_BITS 14            // duty goes from 0 to 16383
+#define SERVO_BITS 14            // Duty goes from 0 to 16383
 
 #define STEER_CENTER_US 1500
-#define STEER_RANGE_US 400       // 1100..1900 µs, tune later on the car
+#define STEER_RANGE_US 400       // 1100..1900 us, tune on the car
 
 #define MOTOR_HZ 20000           // 20 kHz, too high to hear
-#define MOTOR_BITS 10            // duty goes from 0 to 1023
+#define MOTOR_BITS 10            // Duty goes from 0 to 1023
 #define MOTOR_FULL ((1 << MOTOR_BITS) - 1)
-#define MOTOR_MAX_PCT 70         // 6V motors, never go past 70%
+#define MOTOR_MAX_PCT 70         // 6V motors, never past 70%
 
-#define TIMEOUT_US 500000        // No message after .5 means phone disconnected.
+#define TIMEOUT_US 500000        // Stop after 0.5 s with no message
+#define CHECK_US 100000          // Check every 0.1 s
 
-#define CHECK_US 100000          // Check every .1/s 
-
-// IN1, IN2, IN3, IN4. They use LEDC channels 1..4 (channel 0 is the servo).
+// IN1..IN4 on LEDC channels 1..4 (channel 0 is the servo)
 static const int motor_pins[4] = { GPIO_NUM_7, GPIO_NUM_10, GPIO_NUM_20, GPIO_NUM_21 };
 
-static int64_t last_msg_us = 0;  // Last joystick message.
+static int64_t last_msg_us = 0;  // Time of the last joystick message
+static bool stopped = true;      // True while auto-stopped
 
-static bool stopped = true;      // True once when already centered.
-
-// Sends a pulse that is `us` microseconds long
+// Servo pulse, `us` microseconds long
 static void set_pulse_us(int us) {
     uint32_t duty = (uint32_t)us * (1 << SERVO_BITS) / SERVO_PERIOD_US;
     ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, duty);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
 }
 
+// Motor PWM on one channel
 static void set_duty(int channel, uint32_t duty) {
     ledc_set_duty(LEDC_LOW_SPEED_MODE, channel, duty);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, channel);
 }
 
-// y from -100 (full back) to 100 (full forward). Both rear motors get the same.
+// Both rear motors get the same speed, y from -100 to 100
 static void set_motors(int y) {
-    int pct = y < 0 ? -y : y;                                  // how hard, 0..100
-    uint32_t duty = pct * MOTOR_MAX_PCT * MOTOR_FULL / 10000;  // 100% stick -> 70% duty
+    int pct = y < 0 ? -y : y;                                  // How hard, 0..100
+    uint32_t duty = pct * MOTOR_MAX_PCT * MOTOR_FULL / 10000;  // Full stick -> 70% duty
 
     uint32_t fwd  = y > 0 ? duty : 0;
     uint32_t back = y < 0 ? duty : 0;
 
-    set_duty(LEDC_CHANNEL_1, fwd);   // left  IN1
-    set_duty(LEDC_CHANNEL_2, back);  // left  IN2
-    set_duty(LEDC_CHANNEL_3, fwd);   // right IN3
-    set_duty(LEDC_CHANNEL_4, back);  // right IN4
+    set_duty(LEDC_CHANNEL_1, fwd);   // Left  IN1
+    set_duty(LEDC_CHANNEL_2, back);  // Left  IN2
+    set_duty(LEDC_CHANNEL_3, fwd);   // Right IN3
+    set_duty(LEDC_CHANNEL_4, back);  // Right IN4
 }
 
 void drive_steer(int x) {
@@ -73,7 +72,7 @@ void drive_speed(int y) {
     set_motors(y);
 }
 
-// Runs every 100 ms. Centers the wheels if the phone went quiet.
+// Runs every 0.1 s. Stops the car if the phone goes quiet.
 static void watchdog(void *arg) {
     if (!stopped && esp_timer_get_time() - last_msg_us > TIMEOUT_US) {
         stopped = true;
@@ -84,6 +83,7 @@ static void watchdog(void *arg) {
 }
 
 void drive_start(void) {
+    // Servo: timer 0, channel 0
     ledc_timer_config_t timer = {
         .speed_mode = LEDC_LOW_SPEED_MODE,
         .timer_num = LEDC_TIMER_0,
@@ -105,6 +105,7 @@ void drive_start(void) {
 
     set_pulse_us(STEER_CENTER_US);
 
+    // Motors: timer 1, channels 1..4
     ledc_timer_config_t motor_timer = {
         .speed_mode = LEDC_LOW_SPEED_MODE,
         .timer_num = LEDC_TIMER_1,
@@ -126,7 +127,7 @@ void drive_start(void) {
         ESP_ERROR_CHECK(ledc_channel_config(&ch));
     }
 
-
+    // Auto-stop check
     const esp_timer_create_args_t check_args = {
         .callback = watchdog,
         .name = "drive_watchdog",
