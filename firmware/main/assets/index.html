@@ -29,6 +29,8 @@
     background: #c33;
   }
   #status.on::before { background: #3c6; }
+  #battery { position: fixed; top: 12px; right: 24px; font-size: 14px; }
+  #battery.low { color: #e55; }
   .pad {
     position: relative;
     width: min(220px, 62vh); aspect-ratio: 1;
@@ -59,6 +61,7 @@
 </head>
 <body>
   <div id="status">disconnected</div>
+  <div id="battery">battery --</div>
   <div class="pad v" id="speed"><div class="knob"></div></div>
   <div class="pad h" id="steer"><div class="knob"></div></div>
   <div id="rotate">Turn your phone sideways</div>
@@ -112,6 +115,22 @@ matchMedia('(orientation: portrait)').onchange = e => {
   if (e.matches) { releaseSpeed(); releaseSteer(); }
 };
 
+// Ask the car for "percent,mV" every 2 s
+const battery = document.getElementById('battery');
+function readBattery() {
+  fetch('/battery')
+    .then(r => r.text())
+    .then(t => {
+      const [pct, mv] = t.split(',').map(Number);
+      battery.textContent = `battery ${pct}%, ${(mv / 1000).toFixed(2)} V`;
+      battery.className = pct < 15 ? 'low' : '';
+    })
+    .catch(() => { battery.textContent = 'battery --'; battery.className = ''; });
+}
+readBattery();
+setInterval(readBattery, 2000);
+
+// Send the sticks 20 times a second
 setInterval(() => {
   if (ws.readyState === WebSocket.OPEN) ws.send(x + ',' + y);
 }, 50);

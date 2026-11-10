@@ -5,28 +5,28 @@
 #include "wifi.h"
 #include "web.h"
 #include "drive.h"
+#include "battery.h"
 
-// Onboard blue LED, on when the pin is low
+// Onboard blue LED, lit when the pin is low
 #define LED_PIN GPIO_NUM_8
 
 static const char *TAG = "car";
 
-void app_main(void)
-{
+void app_main(void) {
     ESP_LOGI(TAG, "hello from the car");
     wifi_start();
     drive_start();
+    battery_start();
     web_start();
 
     gpio_reset_pin(LED_PIN);
     gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 
-    // Blinks once a second
+    // Blink once a second to show the car is alive
     int on = 0;
     while (1) {
         on = !on;
         gpio_set_level(LED_PIN, on ? 0 : 1);
-        ESP_LOGI(TAG, "led %s", on ? "on" : "off");
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
