@@ -43,17 +43,26 @@ static void set_duty(int channel, uint32_t duty) {
 }
 
 // Both rear motors get the same speed, y from -100 to 100
+// One pin stays high, the other pulses: on -> brake -> on (strong at any speed)
 static void set_motors(int y) {
     int pct = y < 0 ? -y : y;                                  // How hard, 0..100
     uint32_t duty = pct * MOTOR_MAX_PCT * MOTOR_FULL / 10000;  // Full stick -> 70% duty
 
-    uint32_t fwd  = y > 0 ? duty : 0;
-    uint32_t back = y < 0 ? duty : 0;
+    uint32_t in_a = 0;  // Stick centered: both pins low, motors coast
+    uint32_t in_b = 0;
 
-    set_duty(LEDC_CHANNEL_1, fwd);   // Left  IN1
-    set_duty(LEDC_CHANNEL_2, back);  // Left  IN2
-    set_duty(LEDC_CHANNEL_3, fwd);   // Right IN3
-    set_duty(LEDC_CHANNEL_4, back);  // Right IN4
+    if (y > 0) {                 // Forward
+        in_a = MOTOR_FULL;           // IN1 stays high
+        in_b = MOTOR_FULL - duty;    // IN2 high part = brake, low part = drive
+    } else if (y < 0) {          // Back
+        in_a = MOTOR_FULL - duty;
+        in_b = MOTOR_FULL;
+    }
+
+    set_duty(LEDC_CHANNEL_1, in_a);  // Left  IN1
+    set_duty(LEDC_CHANNEL_2, in_b);  // Left  IN2
+    set_duty(LEDC_CHANNEL_3, in_a);  // Right IN3
+    set_duty(LEDC_CHANNEL_4, in_b);  // Right IN4
 }
 
 void drive_steer(int x) {
