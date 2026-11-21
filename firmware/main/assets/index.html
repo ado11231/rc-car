@@ -19,18 +19,25 @@
     user-select: none;
     -webkit-user-select: none;
   }
-  #status { position: fixed; top: 12px; left: 24px; font-size: 14px; }
-  #status::before {
-    content: "";
-    display: inline-block;
-    width: 8px; height: 8px;
-    margin-right: 8px;
-    border-radius: 50%;
-    background: #c33;
+  #hud {
+    position: fixed;
+    top: 12px; right: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 14px;
+    color: #fff;
   }
-  #status.on::before { background: #3c6; }
-  #battery { position: fixed; top: 12px; right: 24px; font-size: 14px; }
-  #battery.low { color: #e55; }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .icon { width: 30px; flex: none; display: flex; }
+  .icon svg { display: block; }
+  #volt-icon { fill: #fff; }
+  #battery-fill { fill: #3c6; transition: width .4s, fill .4s; }
+  #battery.mid #battery-fill { fill: #fb3; }
+  #battery.low #battery-fill { fill: #e55; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #c33; }
+  #status.on .dot { background: #3c6; }
   .pad {
     position: relative;
     width: min(220px, 62vh); aspect-ratio: 1;
@@ -38,51 +45,114 @@
     border: 2px solid #333;
     background: #1a1a1a;
   }
-  .pad::before { content: ""; position: absolute; background: #2a2a2a; }
-  .pad.v::before { inset: 14px calc(50% - 2px); }
-  .pad.h::before { inset: calc(50% - 2px) 14px; }
+  .arrow {
+    position: absolute;
+    width: 22px; height: 22px;
+    margin: -11px;
+    pointer-events: none;
+  }
+  .arrow svg { width: 100%; height: 100%; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .arrow.up    { top: 22px;    left: 50%; }
+  .arrow.down  { bottom: 22px; left: 50%; transform: rotate(180deg); }
+  .arrow.left  { left: 22px;   top: 50%;  transform: rotate(-90deg); }
+  .arrow.right { right: 22px;  top: 50%;  transform: rotate(90deg); }
   .knob {
     position: absolute;
     inset: 30%;
     border-radius: 50%;
-    background: #f80;
+    background: #ccc;
   }
   .knob.back { transition: transform .15s; }
   #rotate {
     display: none;
     position: fixed;
     inset: 0;
+    z-index: 10;
     background: #111;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 32px;
   }
+  #rotate svg { width: 72px; height: 72px; overflow: visible; }
+  #rotate .phone {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.5;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: turn 2.4s ease-in-out infinite;
+  }
+  #rotate h1 { margin: 0; font-size: 20px; font-weight: 600; color: #fff; }
+  @keyframes turn {
+    0%, 20%   { transform: rotate(0deg); }
+    50%, 80%  { transform: rotate(-90deg); }
+    100%      { transform: rotate(0deg); }
+  }
+  @media (prefers-reduced-motion: reduce) { #rotate .phone { animation: none; transform: rotate(-90deg); } }
   @media (orientation: portrait) { #rotate { display: flex; } }
 </style>
 </head>
 <body>
-  <div id="status">disconnected</div>
-  <div id="battery">battery --</div>
-  <div class="pad v" id="speed"><div class="knob"></div></div>
-  <div class="pad h" id="steer"><div class="knob"></div></div>
-  <div id="rotate">Turn your phone sideways</div>
+  <div id="hud">
+    <div class="row" id="battery">
+      <span class="icon">
+        <svg width="30" height="14" viewBox="0 0 44 20" aria-hidden="true">
+          <rect x="1" y="1" width="38" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+          <rect x="40" y="6" width="3" height="8" rx="1" fill="currentColor"/>
+          <rect id="battery-fill" x="4" y="4" width="0" height="12" rx="2"/>
+        </svg>
+      </span>
+      <span id="battery-pct">--</span>
+    </div>
+    <div class="row">
+      <span class="icon">
+        <svg id="volt-icon" width="10" height="14" viewBox="0 0 14 20" aria-hidden="true">
+          <path d="M8 0L0 11h5l-1 9 8-11H7l1-9z"/>
+        </svg>
+      </span>
+      <span id="battery-volt">--</span>
+    </div>
+    <div class="row" id="status">
+      <span class="icon"><span class="dot"></span></span>
+      <span id="status-text">disconnected</span>
+    </div>
+  </div>
+  <div class="pad" id="speed">
+    <span class="arrow up"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></span>
+    <span class="arrow down"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></span>
+    <div class="knob"></div>
+  </div>
+  <div class="pad" id="steer">
+    <span class="arrow left"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></span>
+    <span class="arrow right"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></span>
+    <div class="knob"></div>
+  </div>
+  <div id="rotate">
+    <svg viewBox="0 0 72 72" aria-hidden="true">
+      <rect class="phone" x="23" y="8" width="26" height="56" rx="5"/>
+    </svg>
+    <h1>Turn your phone sideways</h1>
+  </div>
 
 <script>
 const status = document.getElementById('status');
+const statusText = document.getElementById('status-text');
 let x = 0, y = 0, ws;
 
 function connect() {
   ws = new WebSocket('ws://' + (location.host || '192.168.4.1') + '/ws');
-  ws.onopen = () => { status.textContent = 'connected'; status.className = 'on'; };
+  ws.onopen = () => { statusText.textContent = 'connected'; status.classList.add('on'); };
   ws.onclose = () => {
-    status.textContent = 'disconnected';
-    status.className = '';
+    statusText.textContent = 'disconnected';
+    status.classList.remove('on');
     setTimeout(connect, 1000);
   };
 }
 connect();
 
 function makeStick(pad, vertical, onChange) {
-  const knob = pad.firstChild;
+  const knob = pad.querySelector('.knob');
   let active = false;
 
   function move(e) {
@@ -115,17 +185,29 @@ matchMedia('(orientation: portrait)').onchange = e => {
   if (e.matches) { releaseSpeed(); releaseSteer(); }
 };
 
-// Ask the car for "percent,mV" every 2 s
+// Ask the car for "percent,mV" every 2 s and fill the battery icon to match
 const battery = document.getElementById('battery');
+const batteryFill = document.getElementById('battery-fill');
+const batteryPct = document.getElementById('battery-pct');
+const batteryVolt = document.getElementById('battery-volt');
+const FILL_WIDTH = 32;  // inside width of the battery outline in the SVG
+
+function showBattery(pct, pctText, voltText) {
+  batteryFill.setAttribute('width', FILL_WIDTH * pct / 100);
+  batteryPct.textContent = pctText;
+  batteryVolt.textContent = voltText;
+  battery.classList.toggle('low', pct < 15);
+  battery.classList.toggle('mid', pct >= 15 && pct < 40);
+}
+
 function readBattery() {
   fetch('/battery')
     .then(r => r.text())
     .then(t => {
       const [pct, mv] = t.split(',').map(Number);
-      battery.textContent = `battery ${pct}%, ${(mv / 1000).toFixed(2)} V`;
-      battery.className = pct < 15 ? 'low' : '';
+      showBattery(pct, `${pct}%`, `${(mv / 1000).toFixed(2)} V`);
     })
-    .catch(() => { battery.textContent = 'battery --'; battery.className = ''; });
+    .catch(() => showBattery(0, '--', '--'));
 }
 readBattery();
 setInterval(readBattery, 2000);
