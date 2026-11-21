@@ -1,6 +1,3 @@
-# Kept private for now
-docs/parts-list.md
-
 # Build output, made again by idf.py build
 firmware/build/
 firmware/managed_components/
@@ -10,9 +7,15 @@ firmware/.cache/
 # Blender scripts, kept local for now
 blender/scripts/
 
+# KiCad scripts, kept local for now
+kicad/main-board/scripts/
+
+# KiCad local files (view settings, lock files, backups)
+*.kicad_prl
+*.lck
+fp-info-cache
+*-backups/
+
 # Mac and Blender junk
 .DS_Store
 *.blend1
-
-# Soldering notes, kept local
-docs/soldering-parts.md

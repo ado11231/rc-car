@@ -1,7 +1,7 @@
 # Architecture
 
 * How the car is built and wired, and how the code will run it.
-* What to buy: [parts-list.md](parts-list.md). Drawings: [drawings](drawings/).
+* Drawings: [drawings](drawings/).
 
 ## Contents
 
@@ -335,7 +335,6 @@ rc-car/
 │       └── assets/index.html  the joystick page
 └── docs/
     ├── architecture.md    this file
-    ├── parts-list.md      what to buy (kept out of git for now)
     ├── drawings/          one drawing PDF per printed part, plus all-parts.pdf
     ├── renders/           part pictures (NN-name.png, NN-name-on-car.png)
     └── sketches/          line drawings of the whole car
