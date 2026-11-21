@@ -308,7 +308,7 @@
       "step": "",
       "vrml": ""
     },
-    "page_layout_descr_file": "empty.kicad_wks"
+    "page_layout_descr_file": "${KIPRJMOD}/sheets/empty.kicad_wks"
   },
   "schematic": {
     "bus_aliases": {},
