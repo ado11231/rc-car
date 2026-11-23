@@ -13,7 +13,7 @@ static const char *TAG = "drive";
 #define SERVO_BITS 14            // Duty goes from 0 to 16383
 
 #define STEER_CENTER_US 1500
-#define STEER_RANGE_US 400       // 1100..1900 us, tune on the car
+#define STEER_RANGE_US 230        // 1270..1730 us, about 21 degrees each way, tune on the car
 
 #define MOTOR_HZ 20000           // 20 kHz, too high to hear
 #define MOTOR_BITS 10            // Duty goes from 0 to 1023
