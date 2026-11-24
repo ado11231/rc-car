@@ -24,7 +24,7 @@ static const char *TAG = "drive";
 #define CHECK_US 100000          // Check every 0.1 s
 
 // IN1..IN4 on LEDC channels 1..4 (channel 0 is the servo)
-static const int motor_pins[4] = { GPIO_NUM_7, GPIO_NUM_10, GPIO_NUM_20, GPIO_NUM_21 };
+static const int motor_pins[4] = { GPIO_NUM_7, GPIO_NUM_10, GPIO_NUM_6, GPIO_NUM_5 };
 
 static int64_t last_msg_us = 0;  // Time of the last joystick message
 static bool stopped = true;      // True while auto-stopped
