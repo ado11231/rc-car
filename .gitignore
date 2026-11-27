@@ -3,19 +3,22 @@ firmware/build/
 firmware/managed_components/
 firmware/sdkconfig.old
 firmware/.cache/
-
-# Blender scripts, kept local for now
-blender/scripts/
-
-# KiCad scripts, kept local for now
-kicad/main-board/scripts/
+sim/build/
+sim/sdkconfig.old
 
 # KiCad local files (view settings, lock files, backups)
 *.kicad_prl
 *.lck
 fp-info-cache
 *-backups/
+.history/
+
+# Python cache
+__pycache__/
 
 # Mac and Blender junk
 .DS_Store
 *.blend1
+
+# Claude memory backup (kept out of the public repo)
+claude-memory/

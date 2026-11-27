@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "author": "rc-car",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-c3-devkitm-1",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-servo",
+      "id": "servo",
+      "top": -160,
+      "left": 200,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-slide-potentiometer",
+      "id": "batt",
+      "top": 440,
+      "left": -40,
+      "attrs": {
+        "travelLength": "30",
+        "value": "419"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "in1",
+      "top": -40,
+      "left": 260,
+      "attrs": {
+        "color": "red",
+        "label": "IN1 G7"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "in2",
+      "top": -40,
+      "left": 310,
+      "attrs": {
+        "color": "orange",
+        "label": "IN2 G10"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "in3",
+      "top": -40,
+      "left": 360,
+      "attrs": {
+        "color": "green",
+        "label": "IN3 G6"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "in4",
+      "top": -40,
+      "left": 410,
+      "attrs": {
+        "color": "blue",
+        "label": "IN4 G5"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 40,
+      "left": 250,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 40,
+      "left": 300,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 40,
+      "left": 350,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r4",
+      "top": 40,
+      "left": 400,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-logic-analyzer",
+      "id": "logic",
+      "top": 440,
+      "left": 220,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [
+      "esp:TX",
+      "$serialMonitor:RX",
+      "",
+      []
+    ],
+    [
+      "esp:RX",
+      "$serialMonitor:TX",
+      "",
+      []
+    ],
+    [
+      "esp:0",
+      "servo:PWM",
+      "orange",
+      []
+    ],
+    [
+      "esp:5V.1",
+      "servo:V+",
+      "red",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "servo:GND",
+      "black",
+      []
+    ],
+    [
+      "esp:3",
+      "batt:SIG",
+      "purple",
+      []
+    ],
+    [
+      "esp:3V3.1",
+      "batt:VCC",
+      "red",
+      []
+    ],
+    [
+      "esp:GND.2",
+      "batt:GND",
+      "black",
+      []
+    ],
+    [
+      "esp:7",
+      "r1:2",
+      "blue",
+      []
+    ],
+    [
+      "r1:1",
+      "in1:A",
+      "blue",
+      []
+    ],
+    [
+      "in1:C",
+      "esp:GND.3",
+      "black",
+      []
+    ],
+    [
+      "esp:10",
+      "r2:2",
+      "blue",
+      []
+    ],
+    [
+      "r2:1",
+      "in2:A",
+      "blue",
+      []
+    ],
+    [
+      "in2:C",
+      "esp:GND.3",
+      "black",
+      []
+    ],
+    [
+      "esp:6",
+      "r3:2",
+      "blue",
+      []
+    ],
+    [
+      "r3:1",
+      "in3:A",
+      "blue",
+      []
+    ],
+    [
+      "in3:C",
+      "esp:GND.3",
+      "black",
+      []
+    ],
+    [
+      "esp:5",
+      "r4:2",
+      "blue",
+      []
+    ],
+    [
+      "r4:1",
+      "in4:A",
+      "blue",
+      []
+    ],
+    [
+      "in4:C",
+      "esp:GND.3",
+      "black",
+      []
+    ],
+    [
+      "esp:7",
+      "logic:D0",
+      "blue",
+      []
+    ],
+    [
+      "esp:10",
+      "logic:D1",
+      "blue",
+      []
+    ],
+    [
+      "esp:6",
+      "logic:D2",
+      "blue",
+      []
+    ],
+    [
+      "esp:5",
+      "logic:D3",
+      "blue",
+      []
+    ],
+    [
+      "esp:0",
+      "logic:D4",
+      "orange",
+      []
+    ],
+    [
+      "esp:GND.4",
+      "logic:GND",
+      "black",
+      []
+    ]
+  ],
+  "dependencies": {}
+}

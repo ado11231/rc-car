@@ -203,7 +203,7 @@ flowchart TB
         BUMP["Bumper tongue"]
     end
 
-    TRAY ---|"2 M3 x 6"| PLATE
+    TRAY ---|"2 M3 x 8"| PLATE
     BRD ---|"4 M2 x 6"| PLATE
     BOX ---|"4 M3 x 8"| PLATE
     PLATE ---|"2 M3 x 8"| HOOK
@@ -222,16 +222,17 @@ flowchart TB
 
 * Grey = printed. Blue = bought.
 * The servo shaft is the steering pivot. The beam turns with the servo arm, 22 degrees each way.
-* Front wheels spin on M3 x 30 bolts screwed into the beam ends. Rear wheels push onto the motor shafts.
+* Front wheels spin on M3 x 30 bolts screwed into the beam ends. Drill the front wheel hubs to 3.2 mm first so they turn freely on the bolt. Rear wheels push onto the motor shafts.
 
 | Screws | Count | Where |
 | --- | --- | --- |
-| M3 x 8 | 10 | servo box 4, bumper 4, tow hook 2 |
-| M3 x 6 | 2 | battery tray |
+| M3 x 8 | 12 | servo box 4, bumper 4, tow hook 2, battery tray 2 |
 | M3 x 30 + 4 washers | 2 | front wheels |
 | M2 x 8 | 6 | motor brackets 4 (with nuts), servo arm 2 |
 | M2 x 6 | 4 | main board |
-| Inserts | 14 | plate 6 (3 mm long), servo box 6 (6 mm), beam 2 (8 mm) |
+| Inserts | 14 | all M3: plate 6 (3 mm long), servo box 6 + beam 2 (6 mm) |
+
+* The battery tray M3 x 8 pokes out 2 mm under the plate. Check nothing sits there.
 
 ## The Code
 
