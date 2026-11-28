@@ -3,22 +3,36 @@ firmware/build/
 firmware/managed_components/
 firmware/sdkconfig.old
 firmware/.cache/
-sim/build/
-sim/sdkconfig.old
 
-# KiCad local files (view settings, lock files, backups)
+# Python scripts (Blender + KiCad helpers), kept local
+*.py
+__pycache__/
+blender/scripts/
+kicad/main-board/scripts/
+
+# Blender model, kept local for now
+*.blend
+*.blend1
+
+# Wokwi simulator, kept local
+sim/
+
+# Generated guide PDFs, kept local
+docs/guides/
+
+# KiCad local files (view settings, lock files, backups, autosaves)
 *.kicad_prl
 *.lck
 fp-info-cache
 *-backups/
 .history/
+_autosave-*
+*.bak
+*-bak
+\#auto_saved_files\#
 
-# Python cache
-__pycache__/
-
-# Mac and Blender junk
+# Mac junk
 .DS_Store
-*.blend1
 
 # Claude memory backup (kept out of the public repo)
 claude-memory/

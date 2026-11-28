@@ -1,4 +1,0 @@
-# Wokwi test build: your real drive.c + battery.c, with a fake joystick instead of the phone.
-cmake_minimum_required(VERSION 3.22)
-include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-project(rc_car_sim)
